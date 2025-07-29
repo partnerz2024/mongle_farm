@@ -1,0 +1,895 @@
+/* 몽글팜 - 코지 파스텔 스타일 */
+
+@font-face {
+    font-family: 'DaHyeonFont';
+    src: url('온글잎 박다현체.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DaHyeonFont', 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f4dcc6 50%, #f0d0a0 100%);
+    overflow: hidden;
+    height: 100vh;
+    max-width: 100vw;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    width: 100%;
+    height: 100%;
+    max-width: 450px;
+    max-height: 800px;
+    position: relative;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f4dcc6 100%);
+    border-radius: 25px;
+    box-shadow: 0 8px 32px rgba(139, 69, 19, 0.2);
+    border: 3px solid #d4a574;
+    overflow: hidden;
+}
+
+/* 화면 전환 */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    transition: all 0.5s ease;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.screen.overlay.active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 시작 화면 */
+#start-screen {
+    background: url('mongle_farm_textures/background.png') bottom center/contain no-repeat, 
+                linear-gradient(135deg, #f7e6d3 0%, #f4dcc6 100%);
+    justify-content: flex-start;
+    align-items: center;
+    color: #8b4513;
+    text-align: center;
+    padding: 1rem 2rem 2rem;
+    position: relative;
+}
+
+.title-area {
+    margin-bottom: 3rem;
+    background: transparent;
+    padding: 2rem 2rem 0.5rem 2rem;
+    border-radius: 25px;
+    border: none;
+    box-shadow: none;
+}
+
+.game-title-img {
+    max-width: 500px;
+    width: 95%;
+    height: auto;
+    margin-bottom: -0.5rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    color: #8b4513;
+    text-shadow: 2px 2px 6px rgba(139, 69, 19, 0.8);
+    font-weight: normal;
+    margin-bottom: 2rem;
+    background: rgba(247, 230, 211, 0.8);
+    padding: 0.8rem 1.5rem;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+    margin-top: -0.75rem;
+    margin-bottom: 2rem;
+}
+
+.credit {
+    text-align: center;
+    margin-top: 4rem;
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.credit p {
+    font-size: 0.9rem;
+    color: white;
+    opacity: 1;
+    font-family: 'OnglePark', sans-serif;
+    margin: 0;
+    font-weight: bold;
+}
+
+/* 버튼 스타일 */
+.game-btn, .control-btn, .tool-btn, .seed-btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.game-btn:hover, .control-btn:hover, .tool-btn:hover, .seed-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* 이미지 버튼 스타일 */
+.game-btn-img, .control-btn-img {
+    max-width: 160px;
+    height: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0.8rem;
+    border-radius: 20px;
+}
+
+.game-btn-img:hover, .control-btn-img:hover {
+    transform: translateY(-3px) scale(1.08);
+}
+
+.start-btn-img, .quit-btn-img {
+    max-width: 150px;
+}
+
+.sound-btn-img, .control-btn-img {
+    max-width: 50px;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    font-size: 1.3rem;
+    padding: 1.2rem 2.5rem;
+}
+
+/* 게임 화면 */
+#game-screen {
+    background: linear-gradient(135deg, #f7e6d3 0%, #f4dcc6 100%);
+}
+
+/* 상단 UI */
+.top-ui {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #f0d0a0 0%, #e8c896 100%);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+    border-bottom: 2px solid #d4a574;
+}
+
+.game-info {
+    display: flex;
+    gap: 1rem;
+    font-weight: bold;
+    color: #8b4513;
+    font-size: 0.9rem;
+}
+
+.game-info span {
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f0d0a0 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.15);
+    border: 1px solid #d4a574;
+}
+
+.game-controls {
+    display: flex;
+    gap: 1rem;
+}
+
+.control-btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* 게임 월드 */
+.game-world {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 농장 메인 영역 */
+.farm-main-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* 농장 GUI 컨테이너 */
+.farm-gui-container {
+    position: relative;
+    display: inline-block;
+    /* 투명하게 변경 */
+    background: transparent;
+    border: none;
+    padding: 10px;
+    box-shadow: none;
+    order: 2; /* 곰 아래에 배치 */
+}
+
+.farm-gui-bg {
+    max-width: 300px; /* 모바일에 맞게 줄임 */
+    width: 100%;
+    height: auto;
+    opacity: 1; /* 원본 이미지가 잘 보이도록 */
+    border-radius: 10px;
+}
+
+/* 곰 캐릭터 */
+.bear-character {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    animation: bearBreathe 3s ease-in-out infinite;
+    flex-shrink: 0;
+    order: 1; /* 곰을 위쪽에 배치 */
+}
+
+.bear-img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.3));
+}
+
+/* 농장 구획들 (3x2) */
+.farm-plots {
+    position: absolute;
+    top: 15%;
+    left: 10%;
+    width: 80%;
+    height: 70%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 3%;
+    padding: 0;
+}
+
+.plot {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2%;
+}
+
+.plot:hover {
+    background: rgba(139, 69, 19, 0.05);
+    transform: scale(1.02);
+}
+
+.plot.planted {
+    background: rgba(139, 69, 19, 0.08);
+}
+
+.plot.target {
+    background: rgba(255, 215, 0, 0.2);
+    border: 2px dashed rgba(255, 215, 0, 0.6);
+    animation: targetPulse 2s ease-in-out infinite;
+}
+
+.plot.failed {
+    background: rgba(255, 0, 0, 0.2);
+    border: 2px solid rgba(255, 0, 0, 0.6);
+    cursor: not-allowed;
+}
+
+@keyframes targetPulse {
+    0%, 100% { 
+        background: rgba(255, 215, 0, 0.2);
+        border-color: rgba(255, 215, 0, 0.6);
+    }
+    50% { 
+        background: rgba(255, 215, 0, 0.4);
+        border-color: rgba(255, 215, 0, 0.9);
+    }
+}
+
+.plot.needs-water {
+    background: rgba(0, 102, 204, 0.2);
+    border: 2px dashed rgba(0, 102, 204, 0.6);
+    animation: waterPulse 1s ease-in-out infinite;
+}
+
+@keyframes waterPulse {
+    0%, 100% { 
+        background: rgba(0, 102, 204, 0.2);
+        border-color: rgba(0, 102, 204, 0.6);
+    }
+    50% { 
+        background: rgba(0, 102, 204, 0.4);
+        border-color: rgba(0, 102, 204, 0.9);
+    }
+}
+
+.plot .crop {
+    font-size: 1.5rem;
+    animation: cropGrow 2s ease-in-out;
+}
+
+.crop-img {
+    max-width: 35px;
+    height: auto;
+    animation: cropGrow 2s ease-in-out;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+/* 🧩 퍼즐 시스템 스타일 */
+.bonus-plot {
+    background: linear-gradient(45deg, #ffd700, #ffed4a) !important;
+    border: 3px solid #f39c12 !important;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    animation: bonusGlow 2s ease-in-out infinite;
+}
+
+.plot-hint {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    padding: 2px 4px;
+    border: 1px solid #8b4513;
+    opacity: 0.8;
+}
+
+.violation {
+    animation: violationShake 0.5s ease-in-out;
+}
+
+@keyframes bonusGlow {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+    }
+}
+
+@keyframes violationShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* 퍼즐 진행 상황 스타일 */
+.puzzle-progress {
+    background: linear-gradient(135deg, #8b4513, #a0522d) !important;
+    color: #f7e6d3 !important;
+    font-weight: bold;
+    border: 1px solid #5a3418 !important;
+}
+
+/* 집 */
+.house {
+    position: absolute;
+    bottom: 25%;
+    right: 10%;
+    width: 120px;
+    height: 100px;
+}
+
+.house-roof {
+    font-size: 4rem;
+    text-align: center;
+    filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.3));
+}
+
+.house-body {
+    width: 80px;
+    height: 60px;
+    background: #8b4513;
+    border-radius: 10px;
+    margin: 0 auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* 도구 바 */
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem 1.5rem 0.8rem;
+    background: linear-gradient(135deg, #f0d0a0 0%, #e8c896 100%);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 12px rgba(139, 69, 19, 0.15);
+    border-top: 2px solid #d4a574;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.8rem;
+}
+
+.action-btn-img {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #d4a574;
+    border-radius: 15px;
+    padding: 8px;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f0d0a0 100%);
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.action-btn-img:hover {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #f0d0a0 0%, #e8c896 100%);
+    border-color: #8b4513;
+}
+
+.action-btn-img.active {
+    border-color: #8b4513;
+    background: linear-gradient(135deg, #e8c896 0%, #d4a574 100%);
+    transform: scale(1.05);
+}
+
+/* 물주기 버튼 이미지 크기 조정 */
+.action-btn-img[data-tool="water"] {
+    padding: 4px; /* 패딩을 줄여서 이미지 공간 확보 */
+}
+
+.action-btn-img[data-tool="water"]:hover {
+    padding: 4px; /* 호버 시에도 동일한 패딩 유지 */
+}
+
+.action-btn-img[data-tool="water"].active {
+    padding: 4px; /* 액티브 상태에서도 동일한 패딩 유지 */
+}
+
+
+
+
+
+
+
+.tool-btn, .seed-btn {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f0d0a0 100%);
+    color: #8b4513;
+    border: 2px solid #d4a574;
+    border-radius: 12px;
+    font-weight: bold;
+    font-family: 'DaHyeonFont', 'Arial', sans-serif;
+}
+
+.tool-btn.active, .seed-btn.active {
+    background: linear-gradient(135deg, #e8c896 0%, #d4a574 100%);
+    color: #5a3418;
+    border-color: #8b4513;
+    box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
+}
+
+.seed-btn-img {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid #d4a574;
+    border-radius: 15px;
+    padding: 8px;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f0d0a0 100%);
+    box-shadow: 0 3px 8px rgba(139, 69, 19, 0.15);
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.seed-btn-img:hover {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #f0d0a0 0%, #e8c896 100%);
+    box-shadow: 0 5px 12px rgba(139, 69, 19, 0.25);
+    border-color: #8b4513;
+}
+
+.seed-btn-img.active {
+    border-color: #8b4513;
+    background: linear-gradient(135deg, #e8c896 0%, #d4a574 100%);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    transform: scale(1.05);
+}
+
+/* 일시정지 화면 */
+.pause-content {
+    text-align: center;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f0d0a0 100%);
+    padding: 1.5rem 1.8rem;
+    border-radius: 20px;
+    border: 3px solid #d4a574;
+    width: 280px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+
+
+.pause-content h2 {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    color: #8b4513;
+    font-size: 1.3rem;
+    font-weight: bold;
+    font-family: 'OnglePark', sans-serif;
+}
+
+.pause-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.pause-content .game-btn {
+    background: rgb(229, 161, 89);
+    color: white;
+    border: 2px solid rgb(200, 140, 70);
+    font-size: 1rem;
+    padding: 0.7rem 1.3rem;
+    font-family: 'OnglePark', sans-serif;
+    font-weight: bold;
+    border-radius: 15px;
+    min-width: 120px;
+}
+
+.pause-content .game-btn:hover {
+    background: rgb(210, 145, 75);
+    transform: translateY(-2px);
+}
+
+.pause-content .game-btn-img {
+    max-width: 120px;
+    height: auto;
+}
+
+/* 게임오버 화면 */
+.game-over-content {
+    text-align: center;
+    background: linear-gradient(135deg, #f7e6d3 0%, #f0d0a0 100%);
+    padding: 1.5rem 1.8rem;
+    border-radius: 20px;
+    border: 3px solid #d4a574;
+    width: 320px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: gameOverPop 0.5s ease-out;
+}
+
+
+
+.game-over-img {
+    max-width: 200px;
+    width: 85%;
+    height: auto;
+    margin-bottom: 1.2rem;
+    margin-top: 0;
+}
+
+.game-over-stats {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.08) 0%, rgba(212, 165, 116, 0.12) 100%);
+    border-radius: 15px;
+    border: 2px solid rgba(139, 69, 19, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.game-over-stats h3 {
+    color: #8b4513;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-family: 'OnglePark', sans-serif;
+}
+
+.game-over-stats p {
+    color: #8b4513;
+    opacity: 0.9;
+    margin: 0.2rem 0;
+    font-size: 0.95rem;
+    font-family: 'OnglePark', sans-serif;
+}
+
+.game-over-stats span {
+    font-weight: bold;
+    color: #8b4513;
+    font-size: 1.1rem;
+}
+
+.game-over-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.game-over-content .game-btn {
+    background: rgb(229, 161, 89);
+    color: white;
+    border: 2px solid rgb(200, 140, 70);
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+    font-family: 'OnglePark', sans-serif;
+    font-weight: bold;
+    border-radius: 15px;
+    min-width: 110px;
+}
+
+.game-over-content .game-btn:hover {
+    background: rgb(210, 145, 75);
+    transform: translateY(-2px);
+}
+
+.game-over-content .game-btn-img {
+    max-width: 110px;
+    height: auto;
+}
+
+/* 알림 */
+.notification {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+    color: #f7e6d3;
+    padding: 0.8rem 1.5rem;
+    border-radius: 15px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: 2px solid #d4a574;
+    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+    font-size: 0.9rem;
+    max-width: 300px;
+    text-align: center;
+}
+
+.notification.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 애니메이션 */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes gameOverPop {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.8) translateY(20px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+@keyframes popupSlideIn {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(-20px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+
+
+@keyframes bearBreathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes cropGrow {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    #game-container {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 15px;
+    }
+    
+    .game-title-img {
+        max-width: 280px;
+        width: 95%;
+        margin-bottom: -0.35rem;
+    }
+    
+    .menu-buttons {
+        margin-top: -0.5rem;
+        gap: 0.6rem;
+    }
+    
+    .credit {
+        bottom: 0.3rem;
+    }
+    
+    .credit p {
+        font-size: 0.8rem;
+    }
+    
+    .top-ui {
+        padding: 0.8rem 1rem;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .game-info {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        font-size: 0.75rem;
+    }
+    
+    .game-info span {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .farm-gui-bg {
+        max-width: 260px;
+    }
+    
+    .farm-plots {
+        top: 17%;
+        left: 12%;
+        width: 76%;
+        height: 66%;
+        gap: 2.5%;
+    }
+    
+    .plot {
+        margin: 1.5%;
+        border-radius: 4px;
+    }
+    
+    .crop-img {
+        max-width: 28px;
+    }
+    
+    .bear-character {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .toolbar {
+        padding: 1rem 1rem 0.6rem;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .action-buttons {
+        gap: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .action-btn-img {
+        width: 50px;
+        height: 50px;
+        padding: 6px;
+        border-radius: 12px;
+    }
+    
+    /* 모바일에서 물주기 버튼 이미지 크기 조정 */
+    .action-btn-img[data-tool="water"] {
+        padding: 3px; /* 모바일에서도 패딩을 줄여서 이미지 공간 확보 */
+    }
+    
+    .tool-btn {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.75rem;
+    }
+    
+    .seed-btn-img {
+        width: 50px;
+        height: 50px;
+        padding: 6px;
+        border-radius: 12px;
+    }
+    
+    .start-btn-img, .quit-btn-img {
+        max-width: 130px;
+    }
+    
+    .sound-btn-img, .control-btn-img {
+        max-width: 45px;
+    }
+    
+    .notification {
+        top: 60px;
+        font-size: 0.8rem;
+        padding: 0.6rem 1.2rem;
+        max-width: 250px;
+    }
+    
+    #start-screen {
+        background: url('mongle_farm_textures/background.png') bottom center/contain no-repeat, 
+                    linear-gradient(135deg, #f7e6d3 0%, #f4dcc6 100%);
+        padding: 0.5rem 1rem 1.5rem;
+        justify-content: flex-start;
+    }
+    
+    .game-title-img {
+        max-width: 400px;
+        width: 95%;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+    }
+} 

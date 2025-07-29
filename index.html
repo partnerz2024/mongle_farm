@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mongle Farm (몽글팜)</title>
+    
+    <!-- PWA 관련 메타 태그들 -->
+    <meta name="description" content="조용한 언덕 위에서 아기 곰과 함께하는 코지 농장 게임">
+    <meta name="theme-color" content="#e5a159">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="몽글팜">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- 아이콘 링크들 -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="screen active">
+            <div class="title-area">
+                <img src="mongle_farm_textures/new title.png" alt="Mongle Farm" class="game-title-img">
+                <div class="menu-buttons">
+                    <img src="mongle_farm_textures/start_button.png" alt="START" id="start-btn" class="game-btn-img start-btn-img">
+                    <img src="mongle_farm_textures/volume_button.png" alt="SOUND" id="sound-btn" class="game-btn-img sound-btn-img">
+                    <img src="mongle_farm_textures/quit_button.png" alt="QUIT" id="quit-btn" class="game-btn-img quit-btn-img">
+                </div>
+                <div class="credit">
+                    <p>@patnerz_dev</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div id="game-screen" class="screen">
+            <!-- 상단 UI -->
+            <div class="top-ui">
+                <div class="game-info">
+                    <span class="puzzle-progress">포인트: 0 | 완료: 0 | 제한: 12s/4s</span>
+                </div>
+                <div class="game-controls">
+                    <img src="mongle_farm_textures/pause_button.png" alt="PAUSE" id="pause-btn" class="control-btn-img">
+                    <img src="mongle_farm_textures/back_button.png" alt="BACK" id="back-btn" class="control-btn-img">
+                </div>
+            </div>
+
+            <!-- 메인 게임 영역 -->
+            <div class="game-world">
+                <!-- 농장 GUI와 캐릭터 영역 -->
+                <div class="farm-main-area">
+                    <!-- 곰 캐릭터 -->
+                    <div class="bear-character" id="bear">
+                        <img src="mongle_farm_textures/big_bear.png" alt="bear" class="bear-img">
+                    </div>
+
+                    <!-- 농장 GUI (3x2) -->
+                    <div class="farm-gui-container">
+                        <img src="mongle_farm_textures/farm.png" alt="farm" class="farm-gui-bg">
+                        <div class="farm-plots" id="farm-plots">
+                            <!-- 동적으로 생성될 농장 구획들 (3x2) -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 도구 바 -->
+            <div class="toolbar">
+                <div class="action-buttons" id="action-buttons">
+                    <img src="mongle_farm_textures/carrot.png" alt="당근 (1)" class="action-btn-img active" data-seed="carrot">
+                    <img src="mongle_farm_textures/apple.png" alt="사과 (2)" class="action-btn-img" data-seed="apple">
+                    <img src="mongle_farm_textures/beatroot.png" alt="비트 (3)" class="action-btn-img" data-seed="flower">
+                    <img src="mongle_farm_textures/water.png" alt="물주기 (4)" class="action-btn-img" data-tool="water">
+                </div>
+            </div>
+        </div>
+
+        <!-- 일시정지 화면 -->
+        <div id="pause-screen" class="screen overlay">
+            <div class="pause-content">
+                <h2>게임 일시정지</h2>
+                <div class="pause-buttons">
+                    <button id="resume-btn" class="game-btn resume-btn">계속하기</button>
+                    <img src="mongle_farm_textures/back_button.png" alt="메인으로" id="main-menu-btn" class="game-btn-img main-menu-btn-img">
+                </div>
+            </div>
+        </div>
+
+        <!-- 게임오버 화면 -->
+        <div id="game-over-screen" class="screen overlay">
+            <div class="game-over-content">
+                <img src="mongle_farm_textures/game_over.png" alt="Game Over" class="game-over-img">
+                <div class="game-over-stats">
+                    <h3>최종 점수: <span id="final-score">0</span></h3>
+                    <p>완료한 목표: <span id="final-targets">0</span>개</p>
+                </div>
+                <div class="game-over-buttons">
+                    <img src="mongle_farm_textures/back_button.png" alt="메인으로" id="game-over-main-btn" class="game-btn-img">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 알림 메시지 -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-text"></span>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- PWA Service Worker 등록 -->
+    <script>
+        // Service Worker 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('몽글팜 Service Worker 등록 성공:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker 등록 실패:', error);
+                    });
+            });
+        }
+
+        // PWA 설치 이벤트 처리
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA 설치 프롬프트 준비됨');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 설치 버튼 표시 (선택사항)
+            // showInstallButton();
+        });
+
+        // PWA 설치 완료 감지
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('몽글팜 PWA 설치 완료!');
+        });
+    </script>
+</body>
+</html> 
